@@ -1,0 +1,109 @@
+.text-area {
+	background-color: rgba(55, 55, 55, 0.5);
+  border: 1px solid black;
+	border-radius:10px;
+}
+
+.background-image {
+	display:block;
+  	width:100%; height:100%;
+  	object-fit: cover;
+
+}
+
+/*
+~~~~~~~~~~~ LAYOUT & STYLIN' OF DIVS IN HTML ~~~~~~~~~~~~~~~~~
+*/
+
+.text-box-styling {
+	border: 1px solid black;
+	border-radius:7px;
+	background-color: white;
+    opacity: 0.65;
+}
+
+.title-position {
+	position: absolute;
+    top: 15px;
+    left: 10%;
+    
+ 	
+	width: 80%;
+	max-width: 800px;
+	text-align: center;
+	font-size: 30px;
+	justify-content: center;
+	margin: auto;
+}
+
+.guess-left-position {
+	position: absolute;
+    top: 80px;
+    left: 10%;
+    
+ 	
+	width: 30%;
+	max-width: 800px;
+	text-align: center;
+	font-size: 15px;
+	justify-content: center;
+	margin: auto;
+}
+
+.batman-image-position {
+	position: absolute;
+    top: 150px;
+    left: 10%;
+}
+
+.batman-image-box-position {
+	position: absolute;
+    top: 120px;
+    left: 10%;
+    width: 30%;
+	max-width: 800px;
+	height: 280px;
+}
+
+.correct-guess-position {
+	position: absolute;
+    top: 125px;
+    right: 10%;
+    
+	width: 40%;
+	max-width: 800px;
+	min-height: 50px;
+	text-align: center;
+	font-size: 30px;
+	font-weight: 10;
+	justify-content: center;
+	margin: auto;
+}
+
+.wrong-guess-position {
+	position: absolute;
+    top: 225px;
+    right: 10%;
+    
+	width: 40%;
+	max-width: 800px;
+	min-height: 20px;
+	text-align: center;
+	font-size: 10px;
+	justify-content: center;
+	margin: auto;
+}
+
+.score-box-position {
+	position: absolute;
+    top: 300px;
+    right: 10%;
+    
+	width: 40%;
+	max-width: 800px;
+	min-height: 20px;
+	text-align: center;
+	font-size: 10px;
+	justify-content: center;
+	margin: auto;
+}

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Batman Escapes</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+</head>
+<body>
+
+	<!-- MATCH SCORE -->
+	<div class="container">
+		<img class="background-image" src="https://images.alphacoders.com/789/thumb-1920-789512.jpg">
+
+		<!-- Top Panel -->
+		<div class="title-position text-box-styling">
+			Batman Escapes!
+		</div>
+
+		<!-- Left Panel -->
+		<div class="guess-left-position text-box-styling">
+			<b>Guesses Remaining: </b><span id="nGuesesLeft"></span>
+		</div>
+
+		<div class="batman-image-box-position text-box-styling">
+			
+		</div>
+
+		<div class = "batman-image-position">
+			<img id="batman-image">
+		</div> 
+
+		<!-- Right Panel -->
+		<div class="correct-guess-position text-box-styling">
+			<span id="guessesSoFar"></span>
+		</div>
+
+		<div class="wrong-guess-position text-box-styling">
+			<p><b>Wrongs so Far: </b><span id="wrongsSoFar"></span></p>
+		</div>
+
+		<div class="score-box-position text-box-styling">
+			<b><u>Match Score</u></b><br/>
+			<p><b>Total Number of Wins: </b><span id="nWins"></span></p>
+			<p><b>Total Number of Losses: </b><span id="nLosses"></span></p>
+		</div>
+		
+	</div>
+
+	<script type="text/javascript">
+		var gameState='Initialize';
+		var subGameState;
+		var newGuess;
+
+		//TO-DO: Listner for button click to end game
+		//TO-DO: Option to select difficulty or sub-theme
+		wordBank=[
+		'jim gordon',
+		'renee montoya',
+		'harvey bullock',
+		'bruce wayne',
+		'alfred pennyworth',
+		'barbara gordon',
+		'jason todd',
+		'selina kyle',
+		'harvey dent',
+		'penguin',
+		'catwoman',
+		'bane',
+		'poison ivy',
+		'scarecrow',
+		'mad hatter',
+		'joker',
+		'clayface',
+		'talia al ghul',
+		'wayne manor',
+		'arkham asylum',
+		'gotham city',
+		'wayne enterprises',
+		'batcave'
+		];
+
+		var wordsUsedHistory = [];
+
+		var maximumNumberGuesses = 8;
+		var numberGuessesRemaining =8;
+
+		var numberOfWins = 0;
+		var numberOfLosses = 0;
+		var wrongGuessHistory = [];
+		var wordGuess =[];
+		var wordGuessString;
+
+		var randomWordIndex;
+		var randomWordArray;
+		var randomWordString;
+		var randomWordLength;
+
+		var indexMatch;
+
+		var nWins;
+		var nLosses;
+		var wrongsSoFar;
+		var guessesSoFar;
+		var nGuesesLeft;
+		var wrongsSoFar;
+
+		function updateHTML() {
+			document.getElementById("nWins").innerHTML = numberOfWins;
+			document.getElementById("nLosses").innerHTML = numberOfLosses;
+			document.getElementById("guessesSoFar").innerHTML = wordGuess.join(' ');
+			document.getElementById("wrongsSoFar").innerHTML = wrongGuessHistory.join(' ');
+			document.getElementById("nGuesesLeft").innerHTML = numberGuessesRemaining;
+			document.getElementById("batman-image").src = "images\\batman_progression\\Batman_"+numberGuessesRemaining+".png";
+		}
+
+		function printState() {
+			console.log('***** MATCH STATE: *****')
+			console.log('Number of Wins: ' + numberOfWins);
+			console.log('Number of Losses: ' + numberOfLosses);
+			console.log('The Word Bank: ' + wordBank);
+			console.log('Words used: ' + wordsUsedHistory);
+
+			console.log('   ----------     ')
+
+			console.log('***** GAME STATE: *****');
+			console.log('Game State: ' + gameState);
+			console.log('Sub-Game State: ' + subGameState);
+			console.log('Number of Guesses Remaining: '+numberGuessesRemaining);
+
+
+			console.log('   ----------     ')
+
+			console.log('***** PLAY STATE: *****');
+			console.log('Hang Man Word (String): ' + randomWordString);
+			console.log('Hang Man Word (Array): ' + randomWordArray);
+			console.log('Most recent guess: ' + newGuess);
+			console.log('Wrong Guesses: ' + wrongGuessHistory);
+			console.log('Correct Guesses: ' + wordGuess);
+
+			console.log('==========================================')
+		}
+
+
+		Array.prototype.findMatchIndex = function (matchCandidate) {
+			var returnArray =[];
+			for (var i=0; i<this.length; i++) {
+				if (this[i] === matchCandidate) {
+					returnArray.push(i)
+				}
+			}
+			return returnArray;
+		} //Array.prototype.findMatchIndex = function (matchCandidate) {
+
+
+		Array.prototype.updateAtIndex = function (element,array) {
+			var j;
+			for (var i=0; i<array.length; i++) {
+				j=array[i];
+				this[j]=element;
+			}
+		} //Array.prototype.updateAtIndex = function (element,array) {
+
+				
+		updateHTML();
+		document.onkeyup = function(event) {
+			var	newGuess = String.fromCharCode(event.keyCode).toLowerCase();
+
+
+			switch (gameState) {
+
+				//Initializing variables and arrays
+				case 'Initialize':
+					gameState='SetUp';
+
+				case 'SetUp':
+
+					//Selecting the Random Word
+					randomWordIndex = Math.floor(Math.random()*wordBank.length);
+					randomWordString = wordBank[randomWordIndex];
+					randomWordArray = randomWordString.split('');
+
+					numberGuessesRemaining = maximumNumberGuesses;
+
+					//Removing used word from the Word Bank and adding it to History
+					wordBank.splice(randomWordIndex,1)
+					wordsUsedHistory.push(randomWordString);
+
+					//Resetting variables for a new Game
+					wrongGuessHistory = [];
+					wordGuess = new Array(randomWordArray.length);
+					wordGuess.fill('_');
+					gameState='Play';
+
+					printState()
+
+				case 'Play':
+						updateHTML();
+						//See if guessed letter is present in the selected word
+						indexMatch = randomWordArray.findMatchIndex(newGuess);
+						if (indexMatch.length) {
+							wordGuess.updateAtIndex(newGuess,indexMatch);					//if so, update the correctly guessed letters
+						} else {															//else, if there is no match and is an incorrectly letter... 
+							numberGuessesRemaining = numberGuessesRemaining-1;
+							if (!wrongGuessHistory.findMatchIndex(newGuess).length) {		//push the letter into the incorrect letter guesses if it's new
+								wrongGuessHistory.push(newGuess);
+							}
+						} //if (indexMatch.length) {
+
+						
+						
+						gameState = 'CheckState';
+						printState()
+
+						
+
+
+				case 'CheckState':
+					//Lose game condition
+					if (numberGuessesRemaining==0) {
+						numberOfLosses = numberOfLosses+1;
+						if (wordBank.length==0) {
+							gameState='End'
+						} else {
+							gameState = 'SetUp';
+						}
+					} else if (wordGuess.toString() == randomWordArray.toString()) {
+						numberOfWins = numberOfWins+1;
+						if (wordBank.length==0) {
+							gameState='End'
+						} else {
+							gameState = 'SetUp';
+						}
+					} else {
+						updateHTML();
+						gameState = 'Play';
+					}
+
+				case 'End':
+					switch(subGameState) {
+						case 'endLoseGame':
+							console.log('You lose the game!');
+
+
+						case 'endWinGame':
+							console.log('Shit man, you actually won!');
+
+						case 'endWinMatch':
+							console.log('All out of words!');
+
+
+						case 'endQuit':
+							console.log('Fucking loser...');
+
+					} //switch(subGameState) {
+					printState()
+			} //switch (gameState) {
+			} //document.onkeyup = function(event) {
+
+	</script>
+</body>
+</html>
