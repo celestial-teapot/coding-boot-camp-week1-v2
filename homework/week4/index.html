@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href=./css/style.css>
+	
+</head>
+	<body id="HTMLbody">
+		<div class="row characterAreaContainer">
+			<span id="gameLogoID"></span>
+			<span id="characterArrayID"></span>
+			<span id="heroCharacterID"></span>
+			<span id="enemyCharacterID"></span>
+			<span id="lightSaberID"></span>
+			<span id="footerInformationID"></span>
+		</div>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+
+			/**************************
+			   CHARACTER DEFINITIONS
+			***************************/
+
+			/*Character States:
+				- uninitiated
+				- enemy
+				- hero
+				- dead
+			*/
+
+			//Using Irwin-Hall distribution
+			//reference: https://en.wikipedia.org/wiki/Irwin%E2%80%93Hall_distribution
+			function generateRandom(mean,iterations) {
+				var temp=0;
+				var randomNumber;
+				for (var i=0; i<iterations; i++) {
+					temp = temp+Math.random();
+				}
+				randomNumber=Math.round(temp*(mean*2)/iterations);
+				return randomNumber;
+			}
+
+
+			var lukeSkywalker = {
+				name: 'Luke Skylwaker',
+				imageURL: './images/characters/LukeSkywalker.png',
+				healthPoints: generateRandom(100,10),
+				attackPoints: generateRandom(20,10),
+				characterState: 'uninitiated',
+				fightEnemy: function(enemyCharacter) {
+					enemyCharacter.healthPoints = enemyCharacter.healthPoints - this.attackPoints;
+					this.attackPoints = this.attackPoints * 2;
+					this.healthPoints = this.healthPoints - enemyCharacter.attackPoints;
+					if (this.healthPoints < 1) {
+						this.characterState = 'heroDead';
+					}
+					if (enemyCharacter.healthPoints < 1) {
+						enemyCharacter.characterState = 'enemyDead';
+					}
+				}, //fightEnemy: function(enemyCharacter) {
+
+				//Output to console the character object varaibles
+				printProperties: function() {
+					console.log('Name: ' + this.name);
+					console.log('characterState: ' + this.characterState);
+					console.log('healthPoints: ' + this.healthPoints);
+					console.log('attackPoints: ' + this.attackPoints);
+					console.log('     ----------------------');
+				}, //printProperties: function(){
+
+
+				jQueryImgHeroEnemy: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+
+
+					
+
+
+					characterContainerDiv.append(characterPotratitImg);
+					characterContainerDiv.css('width','350px');
+					characterContainerDiv.css('margin','10px');
+					characterContainerDiv.append(characterNameDiv);
+					characterContainerDiv.append(characterHPDiv);
+					characterContainerDiv.append(characterAttackDiv);
+					return characterContainerDiv;
+				}, //jQueryImgTag: function() {
+
+
+				jQueryImgTag: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+
+					characterContainerDiv.append(characterPotratitImg);
+					switch (gameState) {
+						case 'selectHero':
+							characterContainerDiv.css('width','200px');
+							characterContainerDiv.css('margin','10px');
+							characterContainerDiv.append(characterNameDiv);
+							characterContainerDiv.append(characterHPDiv);
+							characterContainerDiv.append(characterAttackDiv);
+							break;
+						case 'selectEnemy':
+							if (this.characterState === 'hero') {
+								characterContainerDiv.css('width','350px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							} else {
+								characterContainerDiv.css('width','200px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							}
+							
+							if (this.characterState!=='dead') {
+								characterContainerDiv.append(characterHPDiv);
+								characterContainerDiv.append(characterAttackDiv);
+							} else {
+								var deadTextDiv = $('<div>');
+								deadTextDiv.addClass('defeatedText');
+								deadTextDiv.text('DEFEATED');
+								characterContainerDiv.append(deadTextDiv);
+							}
+							break;
+						case 'battle':
+							characterPotratitImg.css('width','100px');
+							characterPotratitImg.css('margin','5px');
+							characterContainerDiv.css('width','100px');
+							characterContainerDiv.css('margin','5px');
+							break;
+					} //switch (gameState) {
+					characterPotratitImg.data("name",this.name);
+					characterPotratitImg.hover(
+						function(){
+							$(this).css('filter','grayscale(0%)');
+						},
+						function(){
+							$(this).css('filter','grayscale(80%)');
+						}
+					);//characterPotratitImg.hover(
+
+					characterPotratitImg.click(function() {
+						var characterName = $(this).data("name");
+						if (gameState === 'selectHero') {
+							selectHero(characterName);
+						}
+						else if (gameState === 'selectEnemy') {
+							selectEnemy(characterName);
+						}
+					});
+
+					return characterContainerDiv;
+				} //jQueryImgTag: function() {
+			}; //var lukeSkywalker
+
+			var hanSolo = {
+				name: "Han Solo",
+				imageURL: './images/characters/HanSolo.png',
+				healthPoints: generateRandom(50,10),
+				attackPoints: generateRandom(10,10),
+				characterState: 'uninitiated',
+				
+				fightEnemy: function(enemyCharacter) {
+					enemyCharacter.healthPoints = enemyCharacter.healthPoints - this.attackPoints;
+					this.attackPoints = this.attackPoints * 2;
+					this.healthPoints = this.healthPoints - enemyCharacter.attackPoints;
+					if (this.healthPoints < 1) {
+						this.characterState = 'heroDead';
+					}
+					if (enemyCharacter.healthPoints < 1) {
+						enemyCharacter.characterState = 'enemyDead';
+					}
+				}, //fightEnemy: function(enemyCharacter) {
+
+				//Output to console the character object varaibles
+				printProperties: function() {
+					console.log('Name: ' + this.name);
+					console.log('characterState: ' + this.characterState);
+					console.log('healthPoints: ' + this.healthPoints);
+					console.log('attackPoints: ' + this.attackPoints);
+					console.log('     ----------------------');
+				}, //printProperties: function(){
+
+
+				jQueryImgHeroEnemy: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+
+
+					
+
+
+					characterContainerDiv.append(characterPotratitImg);
+					characterContainerDiv.css('width','350px');
+					characterContainerDiv.css('margin','10px');
+					characterContainerDiv.append(characterNameDiv);
+					characterContainerDiv.append(characterHPDiv);
+					characterContainerDiv.append(characterAttackDiv);
+					return characterContainerDiv;
+				}, //jQueryImgTag: function() {
+
+
+				jQueryImgTag: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+
+					characterContainerDiv.append(characterPotratitImg);
+					switch (gameState) {
+						case 'selectHero':
+							characterContainerDiv.css('width','200px');
+							characterContainerDiv.css('margin','10px');
+							characterContainerDiv.append(characterNameDiv);
+							characterContainerDiv.append(characterHPDiv);
+							characterContainerDiv.append(characterAttackDiv);
+							break;
+						case 'selectEnemy':
+							if (this.characterState === 'hero') {
+								characterContainerDiv.css('width','350px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							} else {
+								characterContainerDiv.css('width','200px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							}
+							
+							if (this.characterState!=='dead') {
+								characterContainerDiv.append(characterHPDiv);
+								characterContainerDiv.append(characterAttackDiv);
+							} else {
+								var deadTextDiv = $('<div>');
+								deadTextDiv.addClass('defeatedText');
+								deadTextDiv.text('DEFEATED');
+								characterContainerDiv.append(deadTextDiv);
+							}
+							break;
+						case 'battle':
+							characterPotratitImg.css('width','100px');
+							characterPotratitImg.css('margin','5px');
+							characterContainerDiv.css('width','100px');
+							characterContainerDiv.css('margin','5px');
+							break;
+					} //switch (gameState) {
+					characterPotratitImg.data("name",this.name);
+					characterPotratitImg.hover(
+						function(){
+							$(this).css('filter','grayscale(0%)');
+						},
+						function(){
+							$(this).css('filter','grayscale(80%)');
+						}
+					);//characterPotratitImg.hover(
+
+					characterPotratitImg.click(function() {
+						var characterName = $(this).data("name");
+						if (gameState === 'selectHero') {
+							selectHero(characterName);
+						}
+						else if (gameState === 'selectEnemy') {
+							selectEnemy(characterName);
+						}
+					});
+
+					return characterContainerDiv;
+				} //jQueryImgTag: function() {
+			}; //var hanSolo
+
+			var rey = {
+				name: "Rey Kenobi",
+				imageURL: './images/characters/Rey.png',
+				healthPoints: generateRandom(75,10),
+				attackPoints: generateRandom(25,10),
+				characterState: 'uninitiated',
+
+				fightEnemy: function(enemyCharacter) {
+					enemyCharacter.healthPoints = enemyCharacter.healthPoints - this.attackPoints;
+					this.attackPoints = this.attackPoints * 2;
+					this.healthPoints = this.healthPoints - enemyCharacter.attackPoints;
+					if (this.healthPoints < 1) {
+						this.characterState = 'heroDead';
+					}
+					if (enemyCharacter.healthPoints < 1) {
+						enemyCharacter.characterState = 'enemyDead';
+					}
+				}, //fightEnemy: function(enemyCharacter) {
+
+				//Output to console the character object varaibles
+				printProperties: function() {
+					console.log('Name: ' + this.name);
+					console.log('characterState: ' + this.characterState);
+					console.log('healthPoints: ' + this.healthPoints);
+					console.log('attackPoints: ' + this.attackPoints);
+					console.log('     ----------------------');
+				}, //printProperties: function(){
+
+
+				jQueryImgHeroEnemy: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+
+
+					
+
+
+					characterContainerDiv.append(characterPotratitImg);
+					characterContainerDiv.css('width','350px');
+					characterContainerDiv.css('margin','10px');
+					characterContainerDiv.append(characterNameDiv);
+					characterContainerDiv.append(characterHPDiv);
+					characterContainerDiv.append(characterAttackDiv);
+					return characterContainerDiv;
+				}, //jQueryImgTag: function() {
+
+
+				jQueryImgTag: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+
+					characterContainerDiv.append(characterPotratitImg);
+					switch (gameState) {
+						case 'selectHero':
+							characterContainerDiv.css('width','200px');
+							characterContainerDiv.css('margin','10px');
+							characterContainerDiv.append(characterNameDiv);
+							characterContainerDiv.append(characterHPDiv);
+							characterContainerDiv.append(characterAttackDiv);
+							break;
+						case 'selectEnemy':
+							if (this.characterState === 'hero') {
+								characterContainerDiv.css('width','350px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							} else {
+								characterContainerDiv.css('width','200px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							}
+							
+							if (this.characterState!=='dead') {
+								characterContainerDiv.append(characterHPDiv);
+								characterContainerDiv.append(characterAttackDiv);
+							} else {
+								var deadTextDiv = $('<div>');
+								deadTextDiv.addClass('defeatedText');
+								deadTextDiv.text('DEFEATED');
+								characterContainerDiv.append(deadTextDiv);
+							}
+							break;
+						case 'battle':
+							characterPotratitImg.css('width','100px');
+							characterPotratitImg.css('margin','5px');
+							characterContainerDiv.css('width','100px');
+							characterContainerDiv.css('margin','5px');
+							break;
+					} //switch (gameState) {
+					characterPotratitImg.data("name",this.name);
+					characterPotratitImg.hover(
+						function(){
+							$(this).css('filter','grayscale(0%)');
+						},
+						function(){
+							$(this).css('filter','grayscale(80%)');
+						}
+					);//characterPotratitImg.hover(
+
+					characterPotratitImg.click(function() {
+						var characterName = $(this).data("name");
+						if (gameState === 'selectHero') {
+							selectHero(characterName);
+						}
+						else if (gameState === 'selectEnemy') {
+							selectEnemy(characterName);
+						}
+					});
+
+					return characterContainerDiv;
+				} //jQueryImgTag: function() {
+			}; //rey
+
+			var kyloRen = {
+				name: "Kylo Ren",
+				imageURL: './images/characters/KyloRen.png',
+				healthPoints: generateRandom(75,10),
+				attackPoints: generateRandom(25,10),
+				characterState: 'uninitiated',
+
+				fightEnemy: function(enemyCharacter) {
+					enemyCharacter.healthPoints = enemyCharacter.healthPoints - this.attackPoints;
+					this.attackPoints = this.attackPoints * 2;
+					this.healthPoints = this.healthPoints - enemyCharacter.attackPoints;
+					if (this.healthPoints < 1) {
+						this.characterState = 'heroDead';
+					}
+					if (enemyCharacter.healthPoints < 1) {
+						enemyCharacter.characterState = 'enemyDead';
+					}
+				}, //fightEnemy: function(enemyCharacter) {
+
+				//Output to console the character object varaibles
+				printProperties: function() {
+					console.log('Name: ' + this.name);
+					console.log('characterState: ' + this.characterState);
+					console.log('healthPoints: ' + this.healthPoints);
+					console.log('attackPoints: ' + this.attackPoints);
+					console.log('     ----------------------');
+				}, //printProperties: function(){
+
+				jQueryImgHeroEnemy: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+					
+
+					characterContainerDiv.append(characterPotratitImg);
+					characterContainerDiv.css('width','350px');
+					characterContainerDiv.css('margin','10px');
+					characterContainerDiv.append(characterNameDiv);
+					characterContainerDiv.append(characterHPDiv);
+					characterContainerDiv.append(characterAttackDiv);
+					return characterContainerDiv;
+				}, //jQueryImgTag: function() {
+
+
+				jQueryImgTag: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+
+					characterContainerDiv.append(characterPotratitImg);
+					switch (gameState) {
+						case 'selectHero':
+							characterContainerDiv.css('width','200px');
+							characterContainerDiv.css('margin','10px');
+							characterContainerDiv.append(characterNameDiv);
+							characterContainerDiv.append(characterHPDiv);
+							characterContainerDiv.append(characterAttackDiv);
+							break;
+						case 'selectEnemy':
+							if (this.characterState === 'hero') {
+								characterContainerDiv.css('width','350px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							} else {
+								characterContainerDiv.css('width','200px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							}
+							
+							if (this.characterState!=='dead') {
+								characterContainerDiv.append(characterHPDiv);
+								characterContainerDiv.append(characterAttackDiv);
+							} else {
+								var deadTextDiv = $('<div>');
+								deadTextDiv.addClass('defeatedText');
+								deadTextDiv.text('DEFEATED');
+								characterContainerDiv.append(deadTextDiv);
+							}
+							break;
+						case 'battle':
+							characterPotratitImg.css('width','100px');
+							characterPotratitImg.css('margin','5px');
+							characterContainerDiv.css('width','100px');
+							characterContainerDiv.css('margin','5px');
+							break;
+					} //switch (gameState) {
+					characterPotratitImg.data("name",this.name);
+					characterPotratitImg.hover(
+						function(){
+							$(this).css('filter','grayscale(0%)');
+						},
+						function(){
+							$(this).css('filter','grayscale(80%)');
+						}
+					);//characterPotratitImg.hover(
+
+					characterPotratitImg.click(function() {
+						var characterName = $(this).data("name");
+						if (gameState === 'selectHero') {
+							selectHero(characterName);
+						}
+						else if (gameState === 'selectEnemy') {
+							selectEnemy(characterName);
+						}
+					});
+					return characterContainerDiv;
+				} //jQueryImgTag: function() {
+			}; //var kyloRen
+
+			var captainPhasma = {
+				name: "Captain Phasma",
+				imageURL: './images/characters/CaptainPhasm.png',
+				healthPoints: generateRandom(50,10),
+				attackPoints: generateRandom(10,10),
+				characterState: 'uninitiated',
+
+				/*
+				when called with the hero character on an enemy character, does a round of attack and updates:
+					- hero attack points
+					- hero health points
+					- enemy health points
+					- updates characters to "dead" if health points fall below 1
+				*/
+				fightEnemy: function(enemyCharacter) {
+					enemyCharacter.healthPoints = enemyCharacter.healthPoints - this.attackPoints;
+					this.attackPoints = this.attackPoints * 2;
+					this.healthPoints = this.healthPoints - enemyCharacter.attackPoints;
+					if (this.healthPoints < 1) {
+						this.characterState = 'dead';
+					}
+					if (enemyCharacter.healthPoints < 1) {
+						enemyCharacter.characterState = 'dead';
+					}
+				}, //fightEnemy: function(enemyCharacter) {
+
+				//Output to console the character object varaibles
+				printProperties: function() {
+					console.log('Name: ' + this.name);
+					console.log('characterState: ' + this.characterState);
+					console.log('healthPoints: ' + this.healthPoints);
+					console.log('attackPoints: ' + this.attackPoints);
+					console.log('     ----------------------');
+				}, //printProperties: function(){
+
+				jQueryImgHeroEnemy: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+					
+
+					characterContainerDiv.append(characterPotratitImg);
+					characterContainerDiv.css('width','350px');
+					characterContainerDiv.css('margin','10px');
+					characterContainerDiv.append(characterNameDiv);
+					characterContainerDiv.append(characterHPDiv);
+					characterContainerDiv.append(characterAttackDiv);
+					return characterContainerDiv;
+				}, //jQueryImgTag: function() {
+
+
+				jQueryImgTag: function() {
+					//Div tag that holds the character image and relevant text boxes
+					var characterContainerDiv = $('<div>');
+					characterContainerDiv.addClass('characterContainer');
+
+					//Text box that holds the character Health Points
+					var characterHPDiv = $('<div>');
+					characterHPDiv.text(this.healthPoints+' HP');
+					characterHPDiv.addClass('characterHP');
+
+					//Text box that holds the character attack or counter-attack points
+					var characterAttackDiv = $('<div>');
+					characterAttackDiv.text(this.attackPoints+' Attack');
+					characterAttackDiv.addClass('characterAttack');
+
+					//Text box that holds the character name
+					var characterNameDiv = $('<div>');
+					characterNameDiv.text(this.name);
+					characterNameDiv.addClass('characterProfile characterName');
+
+					//Image box that holds the characters image. Will be resized depending on game state and character state
+					var characterPotratitImg = $("<img>", {
+						src: this.imageURL,
+						alt: this.name,
+					});
+					characterPotratitImg.addClass("characterProfile characterImage");
+
+					switch (this.characterState) {
+						case 'uninitiated':
+							characterPotratitImg.css('filter','grayscale(80%)');
+							characterPotratitImg.css('border-color','rgba(153,117,188,1)');		//purple
+							characterNameDiv.css('border-color','rgba(153,117,188,1)');
+							characterNameDiv.css('color','rgba(93,34,63,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'dead':
+							characterPotratitImg.css('filter','grayscale(100%)');
+							characterPotratitImg.css('border-color','rgba(120,120,120,1)');		//grey
+							characterNameDiv.css('border-color','rgba(120,120,120,1)');
+							characterNameDiv.css('color','rgba(60,60,60,1)');
+							characterNameDiv.css('background-color','rgba(200, 200, 200,1)') 
+							break;
+						case 'enemy':
+							characterPotratitImg.css('border-color','rgba(234,35,35,1)');		//red
+							characterNameDiv.css('border-color','rgba(234,35,35,1)');
+							characterNameDiv.css('color','rgba(234,35,35,1)');
+							characterNameDiv.css('background-color','rgba(227, 216, 221,1)');
+							break;
+						case 'hero':
+							characterPotratitImg.css('border-color','rgba(0,122,204,1)');		//blue
+							characterNameDiv.css('border-color','rgba(0,122,204,1)');
+							break;
+					} //switch (characterState) {
+
+
+					characterContainerDiv.append(characterPotratitImg);
+					switch (gameState) {
+						case 'selectHero':
+							characterContainerDiv.css('width','200px');
+							characterContainerDiv.css('margin','10px');
+							characterContainerDiv.append(characterNameDiv);
+							characterContainerDiv.append(characterHPDiv);
+							characterContainerDiv.append(characterAttackDiv);
+							break;
+						case 'selectEnemy':
+							if (this.characterState === 'hero') {
+								characterContainerDiv.css('width','350px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							} else {
+								characterContainerDiv.css('width','200px');
+								characterContainerDiv.css('margin','10px');
+								characterContainerDiv.append(characterNameDiv);
+							}
+							
+							if (this.characterState!=='dead') {
+								characterContainerDiv.append(characterHPDiv);
+								characterContainerDiv.append(characterAttackDiv);
+							} else {
+								var deadTextDiv = $('<div>');
+								deadTextDiv.addClass('defeatedText');
+								deadTextDiv.text('DEFEATED');
+								characterContainerDiv.append(deadTextDiv);
+							}
+							break;
+						case 'battle':
+							characterPotratitImg.css('width','100px');
+							characterPotratitImg.css('margin','5px');
+							characterContainerDiv.css('width','100px');
+							characterContainerDiv.css('margin','5px');
+							break;
+					} //switch (gameState) {
+					characterPotratitImg.data("name",this.name);
+					characterPotratitImg.hover(
+						function(){
+							$(this).css('filter','grayscale(0%)');
+						},
+						function(){
+							$(this).css('filter','grayscale(80%)');
+						}
+					);//characterPotratitImg.hover(
+
+					characterPotratitImg.click(function() {
+						var characterName = $(this).data("name");
+						if (gameState === 'selectHero') {
+							selectHero(characterName);
+						}
+						else if (gameState === 'selectEnemy') {
+							selectEnemy(characterName);
+						}
+					});
+					return characterContainerDiv;
+				} //jQueryImgTag: function() {
+			} //Captain Phasm
+
+
+
+			var characterArray =[lukeSkywalker,hanSolo,rey,kyloRen,captainPhasma];		//this array holds all the character objects. after hero selection, these become the enemy
+
+			var heroSelection;		//this variable holds the hero, the users' selected character object
+			var enemySelection;		//this variable holds the selected enemy
+
+
+			/*INPUT: iCharacter is the index of the selected character in characterArray
+				RESULT: the selected character is removed from characterArray and saved as the heroSelection variable.		*/
+			function selectHero(heroName) {
+				var iHero;					
+				for (var i=0; i<characterArray.length; i++) {
+					if (characterArray[i].name === heroName) {
+						iHero =i;
+					}
+				}
+				heroSelection = characterArray[iHero];
+				heroSelection.characterState='hero';
+				characterArray.splice(iHero,1);
+				gameState='selectEnemy'
+				clearHTML();
+				updateHTML();
+			} //function selectHero() {
+
+
+			/*INPUT: iCharacter is the index of the selected enemy in characterArray
+				RESULT: the selected enemy is removed from characterArray and saved as the enemySelection variable.	*/
+			function selectEnemy(enemyName) {
+				var iEnemy;					
+				for (var i=0; i<characterArray.length; i++) {
+					if (characterArray[i].name === enemyName) {
+						iEnemy =i;
+						characterArray[iEnemy].characterState = 'enemy';
+						enemySelection = characterArray[iEnemy]
+					}
+				}
+				gameState='battle';
+				clearHTML();
+				updateHTML();
+			} //function selectHero() {
+
+
+
+
+
+			/*
+			Calling the function updateState() updates the variable gameState
+			
+			It checks the characterState varaible of:
+			    - the character object in heroSelection
+			    - the character objects in characterArray
+			
+			The updated gameState corresponds to different phases of the game:
+
+				- selectHero	→ user selects his or her character
+				- selectEnemy	→ user selects the enemy to battle
+				- battle		→ user's character is battling the enemy
+				- gameLose		→ character is defeated and the user has lost the game
+				- gameWin		→ all the enemies are defeated and the user has won the game
+				- error			→ the characterStates are in an arrangement unexpected with valid gameplay. This maeans James messed up programming somewhere.
+			*/
+
+			/*Character States:
+				- uninitiated
+				- selected
+				- dead
+			*/
+			var gameState='selectHero'
+
+			
+
+			function updateHTML() {
+				if (gameState !== 'selectHero') {
+					var heroCharacterDiv = $('<div>');
+					heroCharacterDiv.append(heroSelection.jQueryImgHeroEnemy());
+					heroCharacterDiv.addClass('heroCharacter');
+				} //if (gameState !== 'selectHero') {
+				
+				
+
+
+
+				if (gameState === 'battle') {
+					var enemyCharacterDiv = $('<div>');
+					enemyCharacterDiv.append(enemySelection.jQueryImgHeroEnemy());
+					enemyCharacterDiv.addClass('enemyCharacter');
+					$('#enemyCharacterID').append(enemyCharacterDiv);
+				}
+				
+
+
+				var gameLogoDiv = $("<div>");
+				gameLogoDiv.addClass('headerAreaContainer');
+
+				var starWarsLogoImg = $("<img>", {
+							src: "./Images/etc/StarWarsLogo.svg",
+							alt: "Star Wars Logo"
+						});
+				starWarsLogoImg.addClass('headerStarWarsLogo');
+
+				var gameNameDiv = $("<div>");
+				gameNameDiv.addClass('headerStarWarsGameName');
+				gameNameDiv.text('Jedi Duels');
+
+				gameLogoDiv.append(starWarsLogoImg);
+				gameLogoDiv.append(gameNameDiv);
+				$('#gameLogoID').append(gameLogoDiv);
+
+
+				var characterArrayHTML = $("<div>");
+
+				characterArrayHTML.addClass('characterArrayContainer');
+				for (var i=0; i<characterArray.length; i++) {
+					var characterPotratitImg = characterArray[i].jQueryImgTag();
+					characterArrayHTML.append(characterPotratitImg);
+				}
+
+				var blueLightSaber = $("<img>", {
+					src: './images/etc/blueLightSaber.png',
+					alt: 'Blue Light Saber',
+				});
+				blueLightSaber.addClass('blueLightSaber');
+
+				var redLightSaber = $("<img>", {
+					src: './images/etc/redLightSaber.png',
+					alt: 'Red Light Saber',
+				});
+				redLightSaber.addClass('redLightSaber');
+
+				var attackButton = $('<button>');
+				attackButton.text('Attack!');
+
+				attackButton.addClass('attackButton');
+				attackButton.on('click', function() {
+					heroSelection.fightEnemy(enemySelection);
+					if (heroSelection.healthPoints < 0) {
+						heroSelection.characterState = 'dead';
+						gameState = 'selectHero';
+						alert('You lost!');
+					} else if (enemySelection.healthPoints < 0) {
+						enemySelection.characterState = 'dead';
+						checkWin();
+						if (gameState === 'win') {
+							alert('You win the game!');
+							location.reload();
+							gameState = 'selectHero';
+						} else {
+							gameState = 'selectEnemy';
+						}
+					}
+					console.log(gameState);
+					clearHTML();
+					updateHTML();
+				});
+
+
+
+				var lightSaberDiv = $('<div>');
+				lightSaberDiv.append(blueLightSaber);
+				lightSaberDiv.append(redLightSaber);
+				lightSaberDiv.append(attackButton);
+
+
+				
+
+
+				switch (gameState) {
+					case 'selectHero':
+						$('body').css('background','url(./images/screens/starfield.jpg)');
+						$('body').css('background-size','100%');
+						characterArrayHTML.css('top','160px');
+						characterArrayHTML.css('left','100px');
+						break;
+					case 'selectEnemy':
+						characterArrayHTML.css('top','125px');
+						characterArrayHTML.css('right','20px');
+						$('body').css('background','url(./images/screens/lastjedi.jpg)');
+						$('body').css('background-size','100%');
+						$('#heroCharacterID').append(heroCharacterDiv);
+						break;
+					case 'battle':
+						characterArrayHTML.css('top','40px');
+						characterArrayHTML.css('right','40px');
+						$('body').css('background','url(./images/screens/lastjedi.jpg)');
+						$('body').css('background-size','100%');
+						$('#lightSaberID').append(lightSaberDiv)
+						$('#heroCharacterID').append(heroCharacterDiv);
+						break;
+					default:
+						$('body').css('background','url(./images/screens/lastjedi.jpg)');
+						$('body').css('background-size','100%');
+				} //switch (gameState) {
+
+
+				$("#characterArrayID").append(characterArrayHTML);
+			} //function updateHTML() {
+
+			function clearHTML() {
+				$('#gameLogoID').empty();
+				$('#characterArrayID').empty();
+				$('#heroCharacterID').empty();
+				$('#enemyCharacterID').empty();
+				$('#lightSaberID').empty();
+				$('#footerInformationID').empty();
+			} //function clearHTML() {
+
+			
+
+			function checkWin() {
+				var nDeadCharacters=0;
+				for (var i=0; i < characterArray.length; i++) {
+					if (characterArray[i].characterState === 'dead') {
+						nDeadCharacters = nDeadCharacters+1;
+					}
+				} //for (var i=0; i < characterArray.length(); i++) {
+				if (nDeadCharacters === characterArray.length) {
+					gameState = 'win';
+				}
+			}
+
+
+			updateHTML();
+
+		});
+		
+
+		</script>
+
+	</body>
+</html>
